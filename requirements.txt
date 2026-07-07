@@ -1,0 +1,14 @@
+# runtime
+# (the engine itself is pure-Python stdlib; these are for extras + dev)
+
+# visualization (micrograd/visualize.py)
+graphviz
+
+# tests
+pytest
+torch
+
+# notebook
+numpy
+matplotlib
+jupyter
