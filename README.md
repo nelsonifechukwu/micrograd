@@ -1,14 +1,8 @@
 # micrograd
 
-A tiny scalar-valued autograd engine and a small neural-network library built
-on top of it — a from-scratch implementation of reverse-mode automatic
-differentiation (backpropagation), in the spirit of Andrej Karpathy's
-[micrograd](https://github.com/karpathy/micrograd).
-
-Every number is a `Value` node in a dynamically-built computational graph.
-Calling `.backward()` on an output walks the graph in reverse topological order
-and fills in `.grad` on every node that contributed to it. On top of the engine
-sits a miniature PyTorch-like `nn` API (`Neuron`, `Layer`, `MLP`).
+A from-scratch implementation of a tiny scalar-valued autograd engine with reverse-mode automatic
+differentiation (backpropagation) in the spirit of Andrej Karpathy's
+[micrograd](https://github.com/karpathy/micrograd). On top of this engine sits a miniature PyTorch-like `nn` API (`Neuron`, `Layer`, `MLP`).
 
 ## Layout
 
@@ -75,19 +69,3 @@ The tests build each expression twice — once with `micrograd`, once with
 ```bash
 python -m pytest tests/ -v
 ```
-
-## A note on the backward pass
-
-`Value.backward()` uses a **post-order DFS with a `visited` set** to build the
-topological order, then processes it in reverse. Both details matter:
-
-- the `visited` set ensures a node reused on multiple paths (e.g. an
-  activation feeding several downstream neurons) is processed **once** —
-  otherwise its gradient is double-counted;
-- post-order + reverse guarantees a node runs only **after every parent** has
-  contributed to its `.grad`, so gradients are never propagated half-formed.
-
-A naive pre-order traversal without a visited set passes on simple tree-shaped
-graphs but silently corrupts gradients the moment a value is reused — which is
-every real network. `tests/test_engine.py::test_shared_node_gradient` guards
-against exactly this.
